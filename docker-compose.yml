@@ -1,0 +1,39 @@
+# Local development:
+#   docker compose up -d db          -> PostgreSQL only (run the API with `dotnet run`)
+#   docker compose up -d --build     -> PostgreSQL + API on http://localhost:5080
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: joyspizza
+      POSTGRES_USER: joyspizza
+      POSTGRES_PASSWORD: joyspizza
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U joyspizza -d joyspizza"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend/JoysPizza.Api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: Host=db;Port=5432;Database=joyspizza;Username=joyspizza;Password=joyspizza
+      Stripe__SecretKey: ${STRIPE_SECRET_KEY:-}
+      Stripe__PublishableKey: ${STRIPE_PUBLISHABLE_KEY:-}
+      Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET:-}
+    ports:
+      - "5080:8080"
+    volumes:
+      - uploads:/app/wwwroot/uploads
+
+volumes:
+  pgdata:
+  uploads:

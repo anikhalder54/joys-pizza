@@ -1,0 +1,14 @@
+# frontend
+node_modules/
+dist/
+*.local
+.env
+# backend
+bin/
+obj/
+.vs/
+*.user
+backend/JoysPizza.Api/wwwroot/uploads/*
+!backend/JoysPizza.Api/wwwroot/uploads/.gitkeep
+# misc
+.DS_Store

@@ -1,0 +1,77 @@
+# Try the API from VS Code (REST Client) or Visual Studio / Rider.
+@api = http://localhost:5080
+
+### Public config
+GET {{api}}/api/config
+
+### Menu (available items only)
+GET {{api}}/api/menu
+
+### Sign in as admin — copy "token" from the response into @token
+POST {{api}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "admin@joyspizza.local", "password": "admin123" }
+
+###
+@token = paste-token-here
+
+### Menu including unavailable items (admin)
+GET {{api}}/api/menu?includeUnavailable=true
+Authorization: Bearer {{token}}
+
+### Add a menu item (admin)
+POST {{api}}/api/menu
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Hawaiian Pizza",
+  "description": "Ham, pineapple, mozzarella and tomato sauce.",
+  "price": 14.99,
+  "category": "Pizza",
+  "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800",
+  "tags": ["New"],
+  "special": false,
+  "sizes": [
+    { "label": "Small 10\"", "price": 14.99 },
+    { "label": "Large 16\"", "price": 22.99 }
+  ],
+  "available": true
+}
+
+### Mark an item unavailable (hidden from the website)
+PATCH {{api}}/api/menu/pz-pepperoni/availability
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "available": false }
+
+### Place an order (as any signed-in user)
+POST {{api}}/api/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "items": [
+    { "menuItemId": "pz-margherita", "size": "Large 16\"", "quantity": 1 },
+    { "menuItemId": "dr-soda", "quantity": 2 }
+  ],
+  "fulfillment": "delivery",
+  "customerName": "Jamie Rivera",
+  "email": "jamie@example.com",
+  "phone": "(917) 555-0199",
+  "address": "12 Bank St, New York, NY 10014",
+  "tipPercent": 0.18
+}
+
+### Kitchen dashboard (admin)
+GET {{api}}/api/admin/orders
+Authorization: Bearer {{token}}
+
+### Advance an order (admin)
+PATCH {{api}}/api/admin/orders/ORD-XXXXXXXX/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "status": "Preparing" }
