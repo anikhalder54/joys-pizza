@@ -15,6 +15,20 @@ export const TAG_OPTIONS = ['Vegetarian', 'Vegan', 'Spicy', 'Gluten-free', 'Best
 
 export const isAvailable = (m: MenuItem) => m.available !== false;
 
+/**
+ * Photos for the "Explore the menu" tiles on the home page (online links).
+ * Replace any link with your own photo URL whenever you like.
+ */
+export const CATEGORY_PHOTOS: Record<Category, string> = {
+  Pizza: img('1513104890138-7c749659a591', 600),
+  Pasta: img('1551183053-bf91a1d81141', 600),
+  Burgers: img('1568901346375-23c9450c58cd', 600),
+  Appetizers: img('1527477396000-e27163b481c2', 600),
+  Salads: img('1512621776951-a57141f2eefd', 600),
+  Desserts: img('1571877227200-a0d98ea607e9', 600),
+  Drinks: img('1544145945-f90425340c7e', 600),
+};
+
 export const CATEGORIES: Category[] = [
   'Pizza',
   'Pasta',

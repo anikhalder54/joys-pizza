@@ -1,7 +1,7 @@
 import HeroCarousel from '../components/HeroCarousel';
 import { MenuItems } from '../components/MenuCard';
 import ContactSection from '../components/ContactSection';
-import { CATEGORIES } from '../data/menu';
+import { CATEGORIES, CATEGORY_PHOTOS } from '../data/menu';
 import { useMenu } from '../context/MenuContext';
 import { Link } from '../lib/router';
 
@@ -36,11 +36,23 @@ export default function HomePage() {
           </div>
           <div className="cat-strip">
             {CATEGORIES.map((c) => {
-              const first = available.find((m) => m.category === c);
-              if (!first) return null;
+              // Show a tile only for categories that have items on the menu.
+              const items = available.filter((m) => m.category === c);
+              if (items.length === 0) return null;
+              // Category photo (online link); if it can't load, fall back to an item's own photo.
+              const itemPhoto = items.find((m) => m.image?.trim())?.image;
               return (
                 <Link key={c} to={`/menu?cat=${c}`} className="cat-tile">
-                  <img src={first.image} alt="" loading="lazy" onError={(e) => (e.currentTarget.style.visibility = 'hidden')} />
+                  <img
+                    src={CATEGORY_PHOTOS[c]}
+                    alt=""
+                    loading="lazy"
+                    onError={(e) => {
+                      const el = e.currentTarget;
+                      if (itemPhoto && el.src !== itemPhoto) el.src = itemPhoto;
+                      else el.style.visibility = 'hidden';
+                    }}
+                  />
                   <span>{c}</span>
                 </Link>
               );
