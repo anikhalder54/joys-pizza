@@ -22,6 +22,18 @@ public record LoginRequest(
     [Required, EmailAddress] string Email,
     [Required] string Password);
 
+// ---------------- Staff accounts (admin only) ----------------
+
+/// <summary>Admin creates a new Store Manager login.</summary>
+public record CreateStoreManagerRequest(
+    [Required, StringLength(100, MinimumLength = 2)] string Name,
+    [Required, EmailAddress, StringLength(254)] string Email,
+    [StringLength(30)] string? Phone,
+    [Required, StringLength(100, MinimumLength = 8)] string Password);
+
+/// <summary>Admin gives an existing account (e.g. one created on the website) Store Manager access.</summary>
+public record GrantStoreManagerRequest([Required, EmailAddress, StringLength(254)] string Email);
+
 // ---------------- Menu ----------------
 
 public record SizeDto(
@@ -43,7 +55,7 @@ public record MenuItemDto(
 
 public record MenuItemUpsertRequest(
     [Required, StringLength(80, MinimumLength = 1)] string Name,
-    [Required, StringLength(500, MinimumLength = 10)] string Description,
+    [StringLength(500)] string? Description,
     [Range(typeof(decimal), "0", "1000")] decimal Price,
     MenuCategory Category,
     [StringLength(2048)] string? Image,

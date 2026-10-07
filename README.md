@@ -41,6 +41,21 @@ joys-pizza/
 > **Before launch:** the opening hours, delivery radius ($40 free delivery / $3.99 fee / ~3 miles), the
 > sample menu & prices, and the stock food photos are placeholders — replace them with the real ones.
 
+## Roles
+
+| Role | Can do |
+|---|---|
+| **Admin** | Everything a Store Manager can, plus **Dashboard → Staff**: create Store Manager accounts, give an existing account Store Manager access, remove that access. Also *Reset to sample menu*. |
+| **Store Manager** | Order dashboard (update status, cancel/refund) and menu management (add / edit / hide / delete items, upload photos). Cannot create staff accounts. |
+| **Customer** | Browse, order, pay, track own orders. No access to the dashboard (the API returns 403). |
+
+The first Admin comes from `Seed:AdminEmail` / `Seed:AdminPassword`. Access changes apply immediately — the API
+re-checks the role on every request and signs out anyone whose role changed.
+
+## Menu photos
+Items **with a photo** show as cards (photo + text). Items **without a photo** show as a compact list row.
+Description is optional.
+
 ## Deal: Buy 2 Large Cheese Pizzas, Get 1 Medium FREE
 
 For every **2 Large Cheese Pizzas** in an order, **1 Medium Cheese Pizza** is free.
@@ -113,7 +128,7 @@ registered in Stripe (Settings → Payment method domains). Google Pay shows in 
 
 ## 3. API reference
 
-All responses are JSON (camelCase). Errors use RFC 7807 problem details: `{ "title", "detail", "errors"? }`.
+All responses are JSON (camelCase). *staff* = Admin or Store Manager. Errors use RFC 7807 problem details: `{ "title", "detail", "errors"? }`.
 Auth: `Authorization: Bearer <token>` from login/register.
 
 | Method | Route | Who | Purpose |
@@ -124,18 +139,22 @@ Auth: `Authorization: Bearer <token>` from login/register.
 | GET | `/api/auth/me` | signed in | Current user |
 | GET | `/api/menu` | anyone | Available items. `?includeUnavailable=true` for admins |
 | GET | `/api/menu/{id}` | anyone | One item |
-| POST | `/api/menu` | admin | Add item (name, category, description, price or sizes, image, tags, special, available) |
-| PUT | `/api/menu/{id}` | admin | Edit item |
-| PATCH | `/api/menu/{id}/availability` | admin | `{ "available": false }` hides it from the website |
-| DELETE | `/api/menu/{id}` | admin | Delete item (past orders keep their own copy) |
+| POST | `/api/menu` | staff | Add item (name, category, description, price or sizes, image, tags, special, available) |
+| PUT | `/api/menu/{id}` | staff | Edit item |
+| PATCH | `/api/menu/{id}/availability` | staff | `{ "available": false }` hides it from the website |
+| DELETE | `/api/menu/{id}` | staff | Delete item (past orders keep their own copy) |
 | POST | `/api/menu/reset` | admin | Replace menu with the sample menu |
-| POST | `/api/uploads` | admin | Upload a menu photo (multipart `file`, JPEG/PNG/WebP/GIF ≤ 5 MB) → `{ url }` |
+| POST | `/api/uploads` | staff | Upload a menu photo (multipart `file`, JPEG/PNG/WebP/GIF ≤ 5 MB) → `{ url }` |
 | POST | `/api/orders` | signed in | Place order → `{ order, payment: { mode, clientSecret, publishableKey } }` |
 | POST | `/api/orders/{id}/confirm-payment` | owner | Verify payment with Stripe, send to kitchen |
 | GET | `/api/orders/mine` | signed in | My orders |
 | GET | `/api/orders/{id}` | owner / admin | One order (with live status) |
-| GET | `/api/admin/orders?days=3` | admin | Kitchen feed (paid orders) |
-| PATCH | `/api/admin/orders/{id}/status` | admin | `{ "status": "Preparing" }` · `Cancelled` refunds a paid order |
+| GET | `/api/admin/orders?days=3` | staff | Kitchen feed (paid orders) |
+| GET | `/api/admin/staff` | admin | List admins and store managers |
+| POST | `/api/admin/staff` | admin | Create a Store Manager `{ name, email, phone?, password }` |
+| POST | `/api/admin/staff/grant` | admin | Make an existing account a Store Manager `{ email }` |
+| DELETE | `/api/admin/staff/{id}` | admin | Remove Store Manager access (account becomes a customer) |
+| PATCH | `/api/admin/orders/{id}/status` | staff | `{ "status": "Preparing" }` · `Cancelled` refunds a paid order |
 | POST | `/api/payments/webhook` | Stripe | `payment_intent.succeeded` |
 | GET | `/health` | anyone | Health check |
 

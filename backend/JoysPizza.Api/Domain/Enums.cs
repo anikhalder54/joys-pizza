@@ -9,6 +9,8 @@ public enum UserRole
 {
     [JsonStringEnumMemberName("customer")] Customer,
     [JsonStringEnumMemberName("admin")] Admin,
+    /// <summary>Runs the shop day to day (orders + menu). Cannot create staff accounts.</summary>
+    [JsonStringEnumMemberName("store_manager")] StoreManager,
 }
 
 public enum MenuCategory

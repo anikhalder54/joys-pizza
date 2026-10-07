@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { isStaff } from '../lib/roles';
 import { Link, navigate, useRoute } from '../lib/router';
 import { RESTAURANT } from '../data/restaurant';
 
@@ -39,7 +40,7 @@ export function LoginPage() {
     const res = await login(email, password);
     setBusy(false);
     if (!res.ok) return setError(res.error);
-    navigate(next ?? (res.user.role === 'admin' ? '/admin' : '/'));
+    navigate(next ?? (isStaff(res.user) ? '/admin' : '/'));
   };
 
   return (

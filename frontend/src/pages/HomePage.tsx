@@ -1,5 +1,5 @@
 import HeroCarousel from '../components/HeroCarousel';
-import MenuCard from '../components/MenuCard';
+import { MenuItems } from '../components/MenuCard';
 import ContactSection from '../components/ContactSection';
 import { CATEGORIES } from '../data/menu';
 import { useMenu } from '../context/MenuContext';
@@ -22,11 +22,7 @@ export default function HomePage() {
             </div>
             <Link to="/menu" className="btn btn-outline">See full menu</Link>
           </div>
-          <div className="menu-grid">
-            {specials.map((item) => (
-              <MenuCard key={item.id} item={item} featured />
-            ))}
-          </div>
+          <MenuItems items={specials} featured />
         </div>
       </section>
 

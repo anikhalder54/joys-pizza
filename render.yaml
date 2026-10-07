@@ -1,0 +1,37 @@
+# Render Blueprint for the Joy's Pizza API.
+# Render → New → Blueprint → pick this GitHub repo. Render reads this file, generates Jwt__Key itself,
+# and asks you to paste the values marked "sync: false".
+services:
+  - type: web
+    name: joys-pizza-api
+    runtime: docker
+    dockerfilePath: ./backend/JoysPizza.Api/Dockerfile
+    dockerContext: ./backend/JoysPizza.Api
+    region: virginia            # close to Supabase "East US (North Virginia)" and to New York
+    plan: 0.5c-512mb            # always-on paid instance (Starter). Use "free" only for testing (sleeps after 15 min).
+    healthCheckPath: /health
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - backend/**            # only rebuild the API when backend code changes
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: PORT
+        value: "8080"
+      - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+        value: "true"
+      - key: Jwt__Key
+        generateValue: true     # Render creates a random 256-bit secret — nothing to paste
+      - key: ConnectionStrings__Default
+        sync: false             # Supabase Session pooler string (…;SSL Mode=Require)
+      - key: Seed__AdminEmail
+        sync: false             # your admin login email
+      - key: Seed__AdminPassword
+        sync: false             # strong admin password (stored hashed)
+      - key: Stripe__SecretKey
+        sync: false             # sk_test_…
+      - key: Stripe__PublishableKey
+        sync: false             # pk_test_…
+      - key: Cors__Origins__0
+        sync: false             # your Vercel URL, e.g. https://joys-pizza.vercel.app (no trailing slash)

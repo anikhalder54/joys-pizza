@@ -117,6 +117,12 @@ export const api = {
     orders: (days = 3) => get<Order[]>(`/api/admin/orders?days=${days}`),
     setStatus: (id: string, status: OrderStatus) =>
       patch<Order>(`/api/admin/orders/${encodeURIComponent(id)}/status`, { status }),
+    // Staff accounts — Admin only (the API returns 403 for anyone else).
+    staff: () => get<PublicUser[]>('/api/admin/staff'),
+    createStoreManager: (data: { name: string; email: string; phone?: string; password: string }) =>
+      post<PublicUser>('/api/admin/staff', data),
+    grantStoreManager: (email: string) => post<PublicUser>('/api/admin/staff/grant', { email }),
+    revokeStoreManager: (id: string) => del<void>(`/api/admin/staff/${encodeURIComponent(id)}`),
   },
 };
 

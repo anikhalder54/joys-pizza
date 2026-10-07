@@ -98,7 +98,6 @@ export default function MenuItemForm({ initial, onSave, onUpload, onClose }: Pro
   // ---------- validation ----------
   const errors: Record<string, string> = {};
   if (!d.name.trim()) errors.name = 'Enter a name';
-  if (d.description.trim().length < 10) errors.description = 'Add a short description (10+ characters)';
   if (useSizes) {
     if (sizes.length === 0) errors.sizes = 'Add at least one size';
     else if (sizes.some((s) => !s.label.trim() || !(s.price > 0))) errors.sizes = 'Every size needs a label and a price';
@@ -157,7 +156,7 @@ export default function MenuItemForm({ initial, onSave, onUpload, onClose }: Pro
               </label>
 
               <label>
-                Description *
+                Description (optional)
                 <textarea rows={3} className={bad('description')} value={d.description} onChange={(e) => set('description', e.target.value)} placeholder="Ingredients, how it's prepared, serving size…" />
                 {show('description')}
               </label>

@@ -37,7 +37,7 @@ export interface CartLine {
   qty: number;
 }
 
-export type Role = 'customer' | 'admin';
+export type Role = 'customer' | 'store_manager' | 'admin';
 
 export interface PublicUser {
   id: string;

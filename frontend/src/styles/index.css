@@ -847,3 +847,31 @@ input.invalid { border-color: var(--red); background: #fff8f6; }
 .promo-line { color: var(--green); font-size: 0.9rem; gap: 12px; }
 .promo-line strong { white-space: nowrap; }
 .totals .promo-line dt, .totals .promo-line dd { color: var(--green); }
+
+/* Menu items without a photo: compact list rows */
+.menu-list { background: var(--paper); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.menu-list.after-grid { margin-top: 22px; }
+.menu-row { display: flex; gap: 20px; align-items: center; justify-content: space-between; padding: 16px 20px; border-top: 1px solid var(--line); }
+.menu-row:first-child { border-top: 0; }
+.menu-row:hover { background: #fdfaf5; }
+.menu-row-main { min-width: 0; flex: 1; }
+.menu-row-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.menu-row h3 { font-size: 1.08rem; margin: 0; }
+.menu-row p { font-size: 0.88rem; color: var(--ink-2); margin: 4px 0 0; }
+.menu-row .tags { margin: 8px 0 0; }
+.menu-row-side { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.menu-row-side .menu-card-actions { margin: 0; gap: 10px; }
+.menu-row-side .price { font-size: 1.05rem; min-width: 64px; text-align: right; }
+.tag-special { background: #fff4d9; color: #8a6200; border-color: #f5e2ac; font-family: var(--font-brand); }
+@media (max-width: 640px) {
+  .menu-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .menu-row-side { justify-content: space-between; }
+  .menu-row-side .price { text-align: left; min-width: 0; }
+}
+
+/* Admin → Staff page */
+.staff-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; align-items: start; margin-bottom: 8px; }
+.staff-grid h3 { margin: 0; }
+.staff-row { grid-template-columns: minmax(0, 1fr) auto; }
+@media (max-width: 860px) { .staff-grid { grid-template-columns: 1fr; } }
+.staff-row .item-main, .staff-row .item-actions { grid-column: auto; }

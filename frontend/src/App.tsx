@@ -13,6 +13,7 @@ import { LoginPage, SignupPage } from './pages/AuthPages';
 import { MyOrdersPage, OrderDetailPage } from './pages/OrdersPages';
 import AdminPage from './pages/AdminPage';
 import AdminMenuPage from './pages/AdminMenuPage';
+import AdminStaffPage from './pages/AdminStaffPage';
 import { ContactPage, LocationPage, NotFoundPage } from './pages/InfoPages';
 
 function Routes() {
@@ -34,6 +35,8 @@ function Routes() {
       return <AdminPage />;
     case '/admin/menu':
       return <AdminMenuPage />;
+    case '/admin/staff':
+      return <AdminStaffPage />;
     case '/location':
       return <LocationPage />;
     case '/contact':

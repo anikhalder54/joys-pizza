@@ -3,21 +3,30 @@ import { useAuth } from '../context/AuthContext';
 import { useAdminOrders } from '../context/OrdersContext';
 import { useMenu } from '../context/MenuContext';
 import { Link, navigate, useRoute } from '../lib/router';
+import { isAdmin, isStaff } from '../lib/roles';
 
-/** Redirects to login if signed out. Returns the user and whether they are an admin. */
+/**
+ * Redirects to login if signed out.
+ * isStaff = Admin or Store Manager (dashboard access). isAdmin = Admin only (staff accounts, menu reset).
+ * Customers get neither, and the API enforces the same rules.
+ */
 export function useAdminGuard(next: string) {
   const { user, checking } = useAuth();
   useEffect(() => {
     if (!user && !checking) navigate(`/login?next=${next}`);
   }, [user, checking, next]);
-  return { user, isAdmin: user?.role === 'admin' };
+  return { user, isStaff: isStaff(user), isAdmin: isAdmin(user) };
 }
 
-export function StaffOnly() {
+export function StaffOnly({ adminOnly = false }: { adminOnly?: boolean }) {
   return (
     <div className="page container narrow center-page">
-      <h1>Staff only</h1>
-      <p className="muted">You need an admin account to view this page.</p>
+      <h1>{adminOnly ? 'Admins only' : 'Staff only'}</h1>
+      <p className="muted">
+        {adminOnly
+          ? 'Only an Admin can manage staff accounts.'
+          : 'You need an Admin or Store Manager account to view this page.'}
+      </p>
       <Link to="/" className="btn btn-primary">Back home</Link>
     </div>
   );
@@ -32,6 +41,7 @@ export function AdminTabsWithCount() {
 export default function AdminTabs({ newOrders }: { newOrders: number }) {
   const { path } = useRoute();
   const { items } = useMenu();
+  const { user } = useAuth();
   const hidden = items.filter((m) => m.available === false).length;
 
   return (
@@ -42,6 +52,11 @@ export default function AdminTabs({ newOrders }: { newOrders: number }) {
       <Link to="/admin/menu" className={path === '/admin/menu' ? 'active' : ''}>
         Menu items {hidden > 0 && <span className="badge muted-badge">{hidden} hidden</span>}
       </Link>
+      {isAdmin(user) && (
+        <Link to="/admin/staff" className={path === '/admin/staff' ? 'active' : ''}>
+          Staff
+        </Link>
+      )}
     </nav>
   );
 }

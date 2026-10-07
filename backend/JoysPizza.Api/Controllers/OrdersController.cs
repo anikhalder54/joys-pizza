@@ -54,7 +54,7 @@ public class OrdersController(AppDbContext db, OrderService orders) : Controller
         return list.Select(o => o.ToDto()).ToList();
     }
 
-    /// <summary>One order. Customers can see their own orders; admins can see any order.</summary>
+    /// <summary>One order. Customers can see their own orders; staff (admin / store manager) can see any order.</summary>
     [HttpGet("{number}")]
     public async Task<ActionResult<OrderDto>> Get(string number, CancellationToken ct)
     {
@@ -69,14 +69,14 @@ public class OrdersController(AppDbContext db, OrderService orders) : Controller
     {
         var order = await db.Orders.Include(o => o.Items).FirstOrDefaultAsync(o => o.Number == number, ct);
         if (order is null) return null;
-        return order.UserId == User.GetUserId() || User.IsAdmin() ? order : null;
+        return order.UserId == User.GetUserId() || User.IsStaff() ? order : null;
     }
 }
 
 /// <summary>Kitchen dashboard endpoints.</summary>
 [ApiController]
 [Route("api/admin/orders")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = AppRoles.Staff)]
 public class AdminOrdersController(AppDbContext db, OrderService orders, TimeProvider clock) : ControllerBase
 {
     /// <summary>Paid orders from the last <paramref name="days"/> days (default 3), newest first.</summary>

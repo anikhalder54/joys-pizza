@@ -47,5 +47,18 @@ public static class ClaimsPrincipalExtensions
             ? id
             : throw new ApiException(StatusCodes.Status401Unauthorized, "Unauthorized", "Missing or invalid user id in token.");
 
-    public static bool IsAdmin(this ClaimsPrincipal user) => user.IsInRole("Admin");
+    public static bool IsAdmin(this ClaimsPrincipal user) => user.IsInRole(AppRoles.Admin);
+
+    /// <summary>Admin or Store Manager.</summary>
+    public static bool IsStaff(this ClaimsPrincipal user) =>
+        user.IsInRole(AppRoles.Admin) || user.IsInRole(AppRoles.StoreManager);
+}
+
+/// <summary>Role names used in [Authorize(Roles = ...)] — they match UserRole.ToString() in the token.</summary>
+public static class AppRoles
+{
+    public const string Admin = "Admin";
+    public const string StoreManager = "StoreManager";
+    /// <summary>Kitchen dashboard + menu management.</summary>
+    public const string Staff = "Admin,StoreManager";
 }

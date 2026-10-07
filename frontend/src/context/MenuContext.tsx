@@ -3,6 +3,7 @@ import type { MenuItem, MenuItemInput } from '../types';
 import { isAvailable } from '../data/menu';
 import { api, errorMessage } from '../lib/api';
 import { useAuth } from './AuthContext';
+import { isStaff } from '../lib/roles';
 
 /**
  * Menu loaded from the API. Customers receive available items only; admins also
@@ -30,21 +31,21 @@ const REFRESH_MS = 60_000;
 
 export function MenuProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const staff = isStaff(user);
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
     try {
-      setItems(await api.menu.list(isAdmin));
+      setItems(await api.menu.list(staff));
       setError(null);
     } catch (e) {
       setError(errorMessage(e));
     } finally {
       setLoading(false);
     }
-  }, [isAdmin]);
+  }, [staff]);
 
   // Load on start / when switching between customer and admin, and refresh periodically
   // so items an admin hides disappear for customers without a page reload.

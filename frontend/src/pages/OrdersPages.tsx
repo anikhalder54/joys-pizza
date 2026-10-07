@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMyOrders, useOrder } from '../context/OrdersContext';
+import { isStaff } from '../lib/roles';
 import { useCart } from '../context/CartContext';
 import { Link, navigate, useRoute } from '../lib/router';
 import { money } from '../lib/storage';
@@ -204,8 +205,8 @@ export function OrderDetailPage({ id }: { id: string }) {
       </div>
 
       <div className="row gap">
-        <Link to={user.role === 'admin' ? '/admin' : '/orders'} className="btn btn-outline">
-          ← {user.role === 'admin' ? 'Back to dashboard' : 'All my orders'}
+        <Link to={isStaff(user) ? '/admin' : '/orders'} className="btn btn-outline">
+          ← {isStaff(user) ? 'Back to dashboard' : 'All my orders'}
         </Link>
         <Link to="/menu" className="btn btn-primary">Order more</Link>
       </div>

@@ -21,7 +21,7 @@ const priceLabel = (m: MenuItem) => {
 };
 
 export default function AdminMenuPage() {
-  const { user, isAdmin } = useAdminGuard('/admin/menu');
+  const { user, isStaff, isAdmin } = useAdminGuard('/admin/menu');
   const { items, loading, error: loadError, addItem, updateItem, setAvailable, deleteItem, resetMenu, uploadImage } = useMenu();
 
   const [cat, setCat] = useState<CatFilter>('All');
@@ -55,7 +55,7 @@ export default function AdminMenuPage() {
   }, [items, cat, status, q]);
 
   if (!user) return null;
-  if (!isAdmin) return <StaffOnly />;
+  if (!isStaff) return <StaffOnly />;
 
   const availableCount = items.filter(isAvailable).length;
   const unavailableCount = items.length - availableCount;
@@ -156,7 +156,7 @@ export default function AdminMenuPage() {
                           <strong>{m.name}</strong>
                           {m.special && <span className="special-mark" title="Chef's special"><StarIcon width={12} height={12} /> Special</span>}
                         </div>
-                        <p className="item-desc">{m.description}</p>
+                        {m.description && <p className="item-desc">{m.description}</p>}
                         {!!m.tags?.length && (
                           <div className="tags">
                             {m.tags.map((t) => <span key={t} className={`tag tag-${t.toLowerCase().replace(/\s+/g, '-')}`}>{t}</span>)}
@@ -201,6 +201,7 @@ export default function AdminMenuPage() {
           ))
         )}
 
+        {isAdmin && (
         <div className="reset-row">
           {confirmReset ? (
             <>
@@ -212,6 +213,7 @@ export default function AdminMenuPage() {
             <button className="link-btn" onClick={() => setConfirmReset(true)}>Reset to sample menu</button>
           )}
         </div>
+        )}
       </div>
 
       {formOpen && (

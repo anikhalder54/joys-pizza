@@ -29,8 +29,8 @@ const nextStep = (o: Order): { label: string; to: OrderStatus } | null => {
 };
 
 export default function AdminPage() {
-  const { user, isAdmin } = useAdminGuard('/admin');
-  const { orders, updateStatus, error: loadError, loading } = useAdminOrders(isAdmin);
+  const { user, isStaff } = useAdminGuard('/admin');
+  const { orders, updateStatus, error: loadError, loading } = useAdminOrders(isStaff);
   const [busy, setBusy] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
@@ -70,7 +70,7 @@ export default function AdminPage() {
   }, [orders, today]);
 
   if (!user) return null;
-  if (!isAdmin) return <StaffOnly />;
+  if (!isStaff) return <StaffOnly />;
 
   const term = q.trim().toLowerCase();
   const list = orders

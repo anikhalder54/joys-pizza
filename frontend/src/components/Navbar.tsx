@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { RESTAURANT } from '../data/restaurant';
 import { CartIcon, CloseIcon, MenuIcon, PinIcon, UserIcon } from './Icons';
+import { isAdmin, isStaff } from '../lib/roles';
 
 export default function Navbar() {
   const { path } = useRoute();
@@ -54,8 +55,8 @@ export default function Navbar() {
           <Link to="/menu" className={active('/menu')}>Menu</Link>
           <Link to="/contact" className={active('/contact')}>Contact</Link>
           {user && (
-            <Link to={user.role === 'admin' ? '/admin' : '/orders'} className={user.role === 'admin' ? (path.startsWith('/admin') ? 'nav-link active' : 'nav-link') : active('/orders')}>
-              {user.role === 'admin' ? 'Dashboard' : 'My Orders'}
+            <Link to={isStaff(user) ? '/admin' : '/orders'} className={isStaff(user) ? (path.startsWith('/admin') ? 'nav-link active' : 'nav-link') : active('/orders')}>
+              {isStaff(user) ? 'Dashboard' : 'My Orders'}
             </Link>
           )}
 
@@ -68,7 +69,7 @@ export default function Navbar() {
               <button className="avatar-btn" onClick={() => setUserMenu((v) => !v)} aria-expanded={userMenu}>
                 <span className="avatar">{user.name.charAt(0).toUpperCase()}</span>
                 <span className="avatar-name">{user.name.split(' ')[0]}</span>
-                {user.role === 'admin' && <span className="pill pill-dark">Admin</span>}
+                {isStaff(user) && <span className="pill pill-dark">{user.role === 'admin' ? 'Admin' : 'Manager'}</span>}
               </button>
               {userMenu && (
                 <div className="dropdown">
@@ -76,8 +77,9 @@ export default function Navbar() {
                     <strong>{user.name}</strong>
                     <small>{user.email}</small>
                   </div>
-                  {user.role === 'admin' && <Link to="/admin">Order dashboard</Link>}
-                  {user.role === 'admin' && <Link to="/admin/menu">Manage menu</Link>}
+                  {isStaff(user) && <Link to="/admin">Order dashboard</Link>}
+                  {isStaff(user) && <Link to="/admin/menu">Manage menu</Link>}
+                  {isAdmin(user) && <Link to="/admin/staff">Manage staff</Link>}
                   <Link to="/orders">My orders</Link>
                   <button
                     onClick={() => {

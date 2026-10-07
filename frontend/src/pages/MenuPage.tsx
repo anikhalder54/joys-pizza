@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import MenuCard from '../components/MenuCard';
+import { MenuItems } from '../components/MenuCard';
 import { CATEGORIES } from '../data/menu';
 import { useMenu } from '../context/MenuContext';
 import type { Category } from '../types';
@@ -72,11 +72,7 @@ export default function MenuPage() {
           .map((g) => (
             <section key={g.c} className="menu-section" id={`cat-${g.c}`}>
               <h2>{g.c}</h2>
-              <div className="menu-grid">
-                {g.items.map((item) => (
-                  <MenuCard key={item.id} item={item} />
-                ))}
-              </div>
+              <MenuItems items={g.items} />
             </section>
           ))}
       </div>

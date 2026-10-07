@@ -6,10 +6,10 @@ using Microsoft.Extensions.Options;
 
 namespace JoysPizza.Api.Controllers;
 
-/// <summary>Menu photo uploads (admin). Files are saved to wwwroot/uploads and served as static files.</summary>
+/// <summary>Menu photo uploads (admin / store manager). Files are saved to wwwroot/uploads and served as static files.</summary>
 [ApiController]
 [Route("api/uploads")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = AppRoles.Staff)]
 public class UploadsController(IWebHostEnvironment env, IOptions<UploadOptions> options) : ControllerBase
 {
     private static readonly Dictionary<string, string> Allowed = new()

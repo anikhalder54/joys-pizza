@@ -47,6 +47,28 @@ builder.Services
             NameClaimType = "name",
             RoleClaimType = "role",
         };
+        // Reject tokens whose role no longer matches the database (e.g. a Store Manager whose access
+        // was removed, or a deleted account). The website then signs the user out.
+        o.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async ctx =>
+            {
+                var sub = ctx.Principal?.FindFirst("sub")?.Value;
+                var tokenRole = ctx.Principal?.FindFirst("role")?.Value;
+                if (!Guid.TryParse(sub, out var userId))
+                {
+                    ctx.Fail("Invalid token.");
+                    return;
+                }
+                var db = ctx.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+                var currentRole = await db.Users.AsNoTracking()
+                    .Where(u => u.Id == userId)
+                    .Select(u => (UserRole?)u.Role)
+                    .FirstOrDefaultAsync(ctx.HttpContext.RequestAborted);
+                if (currentRole is null || currentRole.Value.ToString() != tokenRole)
+                    ctx.Fail("Your account access changed. Please sign in again.");
+            },
+        };
     });
 builder.Services.AddAuthorization();
 

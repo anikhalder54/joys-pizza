@@ -21,7 +21,7 @@ public class MenuController(AppDbContext db, TimeProvider clock) : ControllerBas
     [AllowAnonymous]
     public async Task<ActionResult<List<MenuItemDto>>> GetAll([FromQuery] bool includeUnavailable, CancellationToken ct)
     {
-        if (includeUnavailable && !User.IsAdmin()) return Forbid();
+        if (includeUnavailable && !User.IsStaff()) return Forbid();
 
         var query = db.MenuItems.AsNoTracking();
         if (!includeUnavailable) query = query.Where(m => m.IsAvailable);
@@ -35,13 +35,13 @@ public class MenuController(AppDbContext db, TimeProvider clock) : ControllerBas
     public async Task<ActionResult<MenuItemDto>> Get(string id, CancellationToken ct)
     {
         var item = await db.MenuItems.AsNoTracking().FirstOrDefaultAsync(m => m.Id == id, ct);
-        if (item is null || (!item.IsAvailable && !User.IsAdmin())) return NotFound();
+        if (item is null || (!item.IsAvailable && !User.IsStaff())) return NotFound();
         return item.ToDto();
     }
 
     /// <summary>Add a new item (admin).</summary>
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = AppRoles.Staff)]
     public async Task<ActionResult<MenuItemDto>> Create(MenuItemUpsertRequest req, CancellationToken ct)
     {
         var item = new MenuItem
@@ -60,7 +60,7 @@ public class MenuController(AppDbContext db, TimeProvider clock) : ControllerBas
 
     /// <summary>Edit an item (admin).</summary>
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = AppRoles.Staff)]
     public async Task<ActionResult<MenuItemDto>> Update(string id, MenuItemUpsertRequest req, CancellationToken ct)
     {
         var item = await db.MenuItems.FirstOrDefaultAsync(m => m.Id == id, ct);
@@ -72,7 +72,7 @@ public class MenuController(AppDbContext db, TimeProvider clock) : ControllerBas
 
     /// <summary>Mark an item available (shown on the website) or unavailable (hidden) (admin).</summary>
     [HttpPatch("{id}/availability")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = AppRoles.Staff)]
     public async Task<ActionResult<MenuItemDto>> SetAvailability(string id, AvailabilityRequest req, CancellationToken ct)
     {
         var item = await db.MenuItems.FirstOrDefaultAsync(m => m.Id == id, ct);
@@ -85,16 +85,16 @@ public class MenuController(AppDbContext db, TimeProvider clock) : ControllerBas
 
     /// <summary>Delete an item permanently (admin). Past orders keep their own copy of the name and price.</summary>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = AppRoles.Staff)]
     public async Task<IActionResult> Delete(string id, CancellationToken ct)
     {
         var deleted = await db.MenuItems.Where(m => m.Id == id).ExecuteDeleteAsync(ct);
         return deleted == 0 ? NotFound() : NoContent();
     }
 
-    /// <summary>Replace the whole menu with the sample menu (admin).</summary>
+    /// <summary>Replace the whole menu with the sample menu (admin only).</summary>
     [HttpPost("reset")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<ActionResult<List<MenuItemDto>>> Reset(CancellationToken ct)
     {
         await db.MenuItems.ExecuteDeleteAsync(ct);
@@ -126,7 +126,7 @@ public class MenuController(AppDbContext db, TimeProvider clock) : ControllerBas
             .ToList();
 
         item.Name = req.Name.Trim();
-        item.Description = req.Description.Trim();
+        item.Description = req.Description?.Trim() ?? "";
         item.Category = req.Category;
         item.ImageUrl = image;
         item.Tags = tags;

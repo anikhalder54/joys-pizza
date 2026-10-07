@@ -59,12 +59,17 @@ public static class DbInitializer
             }
             else
             {
-                var admin = new User { Name = "Store Manager", Email = adminEmail, Role = UserRole.Admin };
+                var admin = new User { Name = "Admin", Email = adminEmail, Role = UserRole.Admin };
                 admin.PasswordHash = hasher.HashPassword(admin, adminPassword);
                 db.Users.Add(admin);
                 log.LogInformation("Created admin account {Email}", adminEmail);
             }
         }
+
+        // Older versions named the first admin "Store Manager" — rename it now that Store Manager is its own role.
+        await db.Users
+            .Where(u => u.Role == UserRole.Admin && u.Name == "Store Manager")
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.Name, "Admin"), ct);
 
         if (config.GetValue<bool>("Seed:DemoCustomer") && !await db.Users.AnyAsync(u => u.Email == "jamie@example.com", ct))
         {
