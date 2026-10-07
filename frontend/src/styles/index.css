@@ -721,7 +721,7 @@ input.invalid { border-color: var(--red); background: #fff8f6; }
 .size-rows { display: flex; flex-direction: column; gap: 8px; }
 .size-row { display: grid; grid-template-columns: 1fr 120px 36px; gap: 8px; align-items: center; }
 .add-size { align-self: flex-start; }
-.image-preview { aspect-ratio: 16 / 10; border-radius: var(--radius-sm); border: 1.5px dashed var(--line); background: var(--cream); display: grid; place-items: center; overflow: hidden; margin-bottom: 8px; }
+.image-preview { aspect-ratio: 4 / 3; border-radius: var(--radius-sm); border: 1.5px dashed var(--line); background: var(--cream); display: grid; place-items: center; overflow: hidden; margin-bottom: 8px; }
 .image-preview img { width: 100%; height: 100%; object-fit: cover; }
 .image-field { display: flex; flex-direction: column; gap: 8px; }
 .image-field .field-label { margin-bottom: 0; }
