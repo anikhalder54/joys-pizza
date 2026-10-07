@@ -16,7 +16,7 @@ Do the steps in order. Keep a text file open to paste the values you collect (ma
 2. On github.com click **New repository** → name `joys-pizza` → **Private** → don't add a README → **Create**.
 3. In PowerShell:
    ```powershell
-   cd C:\Users\RYZEN\Downloads\joys-pizza\joys-pizza
+   cd C:\Users\RYZEN\source\repos\joys-pizza
    git init
    git add .
    git commit -m "Joy's Pizza - first deploy"
@@ -55,9 +55,10 @@ $b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create
 ## Step 5 — Deploy the API (Render)
 1. https://render.com → sign in with GitHub → **New → Web Service** → pick the `joys-pizza` repo.
 2. Settings:
-   - **Name:** `joys-pizza-api` (your API URL becomes `https://joys-pizza-api.onrender.com`)
-   - **Root Directory:** `backend/JoysPizza.Api`
-   - **Language/Runtime:** **Docker** (it finds the `Dockerfile`)
+   - **Name:** `joys-pizza` (your API URL becomes `https://joys-pizza.onrender.com`)
+   - **Language/Runtime:** **Docker**
+   - **Root Directory:** `backend`
+   - **Dockerfile Path:** `JoysPizza.Api/Dockerfile` · **Docker Build Context:** `JoysPizza.Api`
    - **Region:** **Virginia (US East)**
    - **Instance type:** **Starter ($7/mo)** recommended. *Free* works for testing but sleeps after 15 minutes
      and takes ~1 minute to wake up.
@@ -79,12 +80,12 @@ $b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create
 4. **Advanced → Health Check Path:** `/health` → **Create Web Service**.
 5. The first build takes ~5–10 minutes. In **Logs** you should see *Created database tables*,
    *Seeded sample menu* and *Created admin account*.
-6. Test in the browser: `https://joys-pizza-api.onrender.com/api/menu` → you should see the menu as JSON.
+6. Test in the browser: `https://joys-pizza.onrender.com/api/menu` → you should see the menu as JSON.
 
 ## Step 6 — Deploy the website (Vercel)
 1. https://vercel.com → sign in with GitHub → **Add New → Project** → import `joys-pizza`.
 2. **Root Directory:** `frontend` · Framework: **Vite** (auto) · Build: `npm run build` · Output: `dist`.
-3. **Environment Variables:** `VITE_API_URL` = `https://joys-pizza-api.onrender.com` (no trailing slash).
+3. **Environment Variables:** `VITE_API_URL` = `https://joys-pizza.onrender.com` (no trailing slash).
 4. **Deploy.** Copy the site address Vercel gives you (e.g. `https://joys-pizza-xyz.vercel.app`).
 5. Back in **Render → Environment**, set `Cors__Origins__0` to that **exact** address (https, no trailing slash)
    → **Save** (Render redeploys). Without this the site shows "Can't reach the server".
@@ -94,7 +95,7 @@ $b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create
 
 ## Step 7 — Stripe webhook
 1. Stripe → **Developers → Webhooks → Add endpoint**.
-2. URL: `https://joys-pizza-api.onrender.com/api/payments/webhook` · Event: `payment_intent.succeeded`.
+2. URL: `https://joys-pizza.onrender.com/api/payments/webhook` · Event: `payment_intent.succeeded`.
 3. Copy the **Signing secret** (`whsec_…`) → Render → add env var `Stripe__WebhookSecret` → Save.
 
 ## Step 8 — Test everything
@@ -104,6 +105,8 @@ $b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create
 3. In a private browser window: create a customer account → order → pay with `4242 4242 4242 4242`,
    any future date, any CVC/ZIP → the order appears on the admin **Orders** dashboard.
 4. Try the deal: 2 Large Cheese Pizzas + 1 Medium → the Medium shows FREE.
+5. Checkout shows only **Card**, **Apple Pay** and **Google Pay**. Google Pay appears in Chrome with a saved card;
+   Apple Pay appears in Safari on Apple devices after Step 9.3.
 
 ## Step 9 — Go live
 1. **Domain:** buy one (e.g. `joyspizzahempstead.com`). Vercel → Project → **Settings → Domains** → add it

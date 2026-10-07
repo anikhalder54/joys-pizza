@@ -49,8 +49,9 @@ public class StripePaymentService(IOptions<StripeOptions> stripeOptions, IOption
             {
                 Amount = Money.ToCents(order.Total),
                 Currency = restaurant.Value.Currency,
-                // Enables cards, Apple Pay and Google Pay (as turned on in the Stripe Dashboard).
-                AutomaticPaymentMethods = new Stripe.PaymentIntentAutomaticPaymentMethodsOptions { Enabled = true },
+                // Cards only. Apple Pay and Google Pay are card wallets, so they still appear.
+                // (No bank, Cash App, Amazon Pay, Klarna or Link.)
+                PaymentMethodTypes = new List<string> { "card" },
                 Description = $"Joy's Pizza order {order.Number}",
                 ReceiptEmail = order.Email,
                 Metadata = new Dictionary<string, string>

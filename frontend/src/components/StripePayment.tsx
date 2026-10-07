@@ -81,7 +81,13 @@ function PayForm({ amountLabel, returnUrl, onPaid }: Omit<Props, 'clientSecret' 
 
   return (
     <form onSubmit={submit} className="stripe-form">
-      <PaymentElement options={{ layout: 'tabs' }} onReady={() => setReady(true)} />
+      <PaymentElement
+        options={{
+          layout: 'tabs',
+          wallets: { applePay: 'auto', googlePay: 'auto' },
+        }}
+        onReady={() => setReady(true)}
+      />
       {!ready && <p className="muted small">Loading secure payment form…</p>}
       {error && <p className="alert alert-error">{error}</p>}
       <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={!stripe || !ready || busy}>

@@ -109,7 +109,8 @@ and every payment "succeeds", so you can try the whole flow before setting up St
    dotnet user-secrets set "Stripe:WebhookSecret" "whsec_..."   # printed by the command above
    ```
 4. Restart the API. Checkout now shows the Stripe Payment Element with **credit/debit card**,
-   **Apple Pay** and **Google Pay**.
+   **Apple Pay** and **Google Pay** only (`PaymentMethodTypes = ["card"]` in `PaymentService.cs` —
+   no bank, Cash App Pay, Amazon Pay, Klarna or Link).
 
 Test cards: `4242 4242 4242 4242` (Visa credit), `4000 0566 5566 5556` (Visa debit),
 `5200 8282 8282 8210` (Mastercard debit) — any future date, any CVC, any ZIP.

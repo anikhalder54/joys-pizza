@@ -3,10 +3,11 @@
 # and asks you to paste the values marked "sync: false".
 services:
   - type: web
-    name: joys-pizza-api
+    name: joys-pizza
     runtime: docker
-    dockerfilePath: ./backend/JoysPizza.Api/Dockerfile
-    dockerContext: ./backend/JoysPizza.Api
+    rootDir: backend
+    dockerfilePath: ./JoysPizza.Api/Dockerfile
+    dockerContext: ./JoysPizza.Api
     region: virginia            # close to Supabase "East US (North Virginia)" and to New York
     plan: 0.5c-512mb            # always-on paid instance (Starter). Use "free" only for testing (sleeps after 15 min).
     healthCheckPath: /health
@@ -35,3 +36,5 @@ services:
         sync: false             # pk_test_…
       - key: Cors__Origins__0
         sync: false             # your Vercel URL, e.g. https://joys-pizza.vercel.app (no trailing slash)
+      - key: Stripe__WebhookSecret
+        sync: false             # whsec_… from Stripe → Developers → Webhooks
